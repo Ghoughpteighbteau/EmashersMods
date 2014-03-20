@@ -361,6 +361,7 @@ public class EmasherCore
 		
 		GameRegistry.registerBlock(limestone, "limestone");
 		LanguageRegistry.addName(limestone, "Limestone");
+        OreDictionary.registerOre("blockLimestone", new ItemStack(limestone));
 		
 		normalCube = (new BlockNormalCube(normalCubeID, 0, Material.rock))
 				.setHardness(1.5F).setStepSound(Block.soundStoneFootstep)
