@@ -19,6 +19,9 @@ public class TileMJAdapter extends TileAdapterBase implements IPowerReceptor, IE
 	{
 		capacitor = new PowerHandler(this, Type.STORAGE);
 		capacitor.configure(0, 250, 0, 250);
+
+		//minimum 1 mj per tic is freaking crazy as a default!
+		capacitor.setPerdition(new PowerHandler.PerditionCalculator(0.05f));
 	}
 	
 	@Override
@@ -50,16 +53,15 @@ public class TileMJAdapter extends TileAdapterBase implements IPowerReceptor, IE
 			
 			if(te != null)
 			{
-				int toUse = 250;
-				if(capacitor.getEnergyStored() < 250) toUse = (int)capacitor.getEnergyStored();
-				if(toUse <= 0) return;
+				if(capacitor.getEnergyStored() <= 0) return;
 				
 				if(te instanceof IEnergyHandler)
 				{
 					IEnergyHandler ieh = (IEnergyHandler)te;
-					
-					int amnt = ieh.receiveEnergy(d.getOpposite(), SocketsMod.RFperMJ * (int)capacitor.useEnergy(0, toUse, false), false);
-					capacitor.useEnergy(amnt, amnt, true);
+
+					int rfStored = (int) (capacitor.getEnergyStored() * SocketsMod.RFperMJ);
+					float mjConsumed = ieh.receiveEnergy(d.getOpposite(), rfStored, false) / (float)SocketsMod.RFperMJ;
+					capacitor.useEnergy(0, mjConsumed, true);
 				}
 				else if(te instanceof IPowerReceptor)
 				{
@@ -68,8 +70,8 @@ public class TileMJAdapter extends TileAdapterBase implements IPowerReceptor, IE
 					
 					if(pr != null)
 					{
-						int amnt = (int)pr.receiveEnergy(Type.STORAGE, capacitor.useEnergy(0, toUse, false), d.getOpposite());
-						capacitor.useEnergy(amnt, amnt, true);
+						float mjConsumed = pr.receiveEnergy(Type.STORAGE, capacitor.getEnergyStored(), d.getOpposite());
+						capacitor.useEnergy(0, mjConsumed, true);
 					}
 				}
 			}
@@ -81,20 +83,26 @@ public class TileMJAdapter extends TileAdapterBase implements IPowerReceptor, IE
 	@Override
 	public int receiveEnergy(ForgeDirection from, int maxReceive, boolean simulate)
 	{
-		if(! simulate && ! outputs[from.ordinal()])
-		{
-			capacitor.addEnergy(maxReceive / SocketsMod.RFperMJ);
-		}
-		
-		if(! outputs[from.ordinal()]) return maxReceive;
-		else return 0;
+		if(outputs[from.ordinal()]) return 0;
+
+		float maxMjReceive = maxReceive / SocketsMod.RFperMJ;
+		float maxMjAccept = capacitor.getMaxEnergyStored() - capacitor.getEnergyStored();
+		maxMjReceive = maxMjAccept < maxMjReceive ? maxMjAccept : maxMjReceive;
+
+		if(!simulate) capacitor.addEnergy(maxMjReceive);
+
+		return (int)(maxMjReceive * SocketsMod.RFperMJ);
 	}
 
 	@Override
 	public int extractEnergy(ForgeDirection from, int maxExtract, boolean simulate)
 	{
-		if(outputs[from.ordinal()]) return SocketsMod.RFperMJ * (int)capacitor.useEnergy(maxExtract / SocketsMod.RFperMJ, maxExtract / SocketsMod.RFperMJ, ! simulate);
-		return 0;
+		if(!outputs[from.ordinal()]) return 0;
+
+		float maxMj = maxExtract / (float) SocketsMod.RFperMJ;
+		int sentRf = (int)(capacitor.useEnergy(0, maxMj, false) * SocketsMod.RFperMJ); // handles amounts less than 1/10th an MJ
+		capacitor.useEnergy(0,(float) sentRf / SocketsMod.RFperMJ, true); //only use what is sent
+		return sentRf;
 	}
 
 	@Override
@@ -106,13 +114,13 @@ public class TileMJAdapter extends TileAdapterBase implements IPowerReceptor, IE
 	@Override
 	public int getEnergyStored(ForgeDirection from)
 	{
-		return (int)capacitor.getEnergyStored() * SocketsMod.RFperMJ;
+		return (int)(capacitor.getEnergyStored() * SocketsMod.RFperMJ);
 	}
 
 	@Override
 	public int getMaxEnergyStored(ForgeDirection from)
 	{
-		return (int)capacitor.getMaxEnergyStored() * SocketsMod.RFperMJ;
+		return (int)(capacitor.getMaxEnergyStored() * SocketsMod.RFperMJ);
 	}
 
 	// IPowerReceptor
