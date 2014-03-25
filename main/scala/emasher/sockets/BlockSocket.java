@@ -49,26 +49,28 @@ public class BlockSocket extends BlockContainer
 	public Icon[] chargeInd;
 	@SideOnly(Side.CLIENT)
 	public Icon hasData;
+
+	public TileSocket tileSocket;
 	
 	public static final String[] dyes =
-        {
-            "dyeBlack",
-            "dyeRed",
-            "dyeGreen",
-            "dyeBrown",
-            "dyeBlue",
-            "dyePurple",
-            "dyeCyan",
-            "dyeLightGray",
-            "dyeGray",
-            "dyePink",
-            "dyeLime",
-            "dyeYellow",
-            "dyeLightBlue",
-            "dyeMagenta",
-            "dyeOrange",
-            "dyeWhite"
-        };
+		{
+			"dyeBlack",
+			"dyeRed",
+			"dyeGreen",
+			"dyeBrown",
+			"dyeBlue",
+			"dyePurple",
+			"dyeCyan",
+			"dyeLightGray",
+			"dyeGray",
+			"dyePink",
+			"dyeLime",
+			"dyeYellow",
+			"dyeLightBlue",
+			"dyeMagenta",
+			"dyeOrange",
+			"dyeWhite"
+		};
 	
 	public BlockSocket(int id)
 	{
@@ -79,7 +81,8 @@ public class BlockSocket extends BlockContainer
 	@Override
 	public TileEntity createNewTileEntity(World world)
 	{
-		return new TileSocket();
+		tileSocket = new TileSocket();
+		return tileSocket;
 	}
 	
 	@Override
@@ -142,15 +145,15 @@ public class BlockSocket extends BlockContainer
 						theStack.setTagCompound(data);
 						
 						if (! world.isRemote)
-				        {
-				            float f = 0.7F;
-				            double d0 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-				            double d1 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-				            double d2 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-				            EntityItem entityitem = new EntityItem(world, (double)x + d0, (double)y + d1, (double)z + d2, theStack);
-				            entityitem.delayBeforeCanPickup = 10;
-				            world.spawnEntityInWorld(entityitem);
-				        }
+						{
+							float f = 0.7F;
+							double d0 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+							double d1 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+							double d2 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+							EntityItem entityitem = new EntityItem(world, (double)x + d0, (double)y + d1, (double)z + d2, theStack);
+							entityitem.delayBeforeCanPickup = 10;
+							world.spawnEntityInWorld(entityitem);
+						}
 						
 						world.setBlockToAir(x, y, z);
 					}
@@ -163,21 +166,21 @@ public class BlockSocket extends BlockContainer
 							ItemStack theStack = new ItemStack(SocketsMod.module.itemID, 1, sideID);
 							
 							if (! world.isRemote)
-					        {
+							{
 								ForgeDirection d = ForgeDirection.getOrientation(side);
 								int xo = x + d.offsetX;
 								int yo = y + d.offsetY;
 								int zo = z + d.offsetZ;
 								
-					            float f = 0.7F;
-					            double d0 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-					            double d1 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-					            double d2 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-					            EntityItem entityitem = new EntityItem(world, (double)xo + d0, (double)yo + d1, (double)zo + d2, theStack);
-					            entityitem.delayBeforeCanPickup = 5;
-					            world.spawnEntityInWorld(entityitem);
-					            ts.getSide(d).onRemoved(ts, ts.configs[side], ForgeDirection.getOrientation(side));
-					        }
+								float f = 0.7F;
+								double d0 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+								double d1 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+								double d2 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+								EntityItem entityitem = new EntityItem(world, (double)xo + d0, (double)yo + d1, (double)zo + d2, theStack);
+								entityitem.delayBeforeCanPickup = 5;
+								world.spawnEntityInWorld(entityitem);
+								ts.getSide(d).onRemoved(ts, ts.configs[side], ForgeDirection.getOrientation(side));
+							}
 							
 							
 							ts.sides[side] = 0;
@@ -195,15 +198,15 @@ public class BlockSocket extends BlockContainer
 					theStack.setTagCompound(data);
 					
 					if (! world.isRemote)
-			        {
-			            float f = 0.7F;
-			            double d0 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-			            double d1 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-			            double d2 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-			            EntityItem entityitem = new EntityItem(world, (double)x + d0, (double)y + d1, (double)z + d2, theStack);
-			            entityitem.delayBeforeCanPickup = 10;
-			            world.spawnEntityInWorld(entityitem);
-			        }
+					{
+						float f = 0.7F;
+						double d0 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+						double d1 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+						double d2 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+						EntityItem entityitem = new EntityItem(world, (double)x + d0, (double)y + d1, (double)z + d2, theStack);
+						entityitem.delayBeforeCanPickup = 10;
+						world.spawnEntityInWorld(entityitem);
+					}
 					
 					world.setBlockToAir(x, y, z);
 					world.removeBlockTileEntity(x, y, z);
@@ -217,17 +220,17 @@ public class BlockSocket extends BlockContainer
 						ItemStack theStack = new ItemStack(SocketsMod.module.itemID, 1, sideID);
 						
 						if (! world.isRemote)
-				        {
-				            float f = 0.7F;
-				            double d0 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-				            double d1 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-				            double d2 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
-				            EntityItem entityitem = new EntityItem(world, (double)x + d0, (double)y + d1, (double)z + d2, theStack);
-				            entityitem.delayBeforeCanPickup = 10;
-				            world.spawnEntityInWorld(entityitem);
-				            ts.getSide(ForgeDirection.getOrientation(side))
-				            	.onRemoved(ts, ts.configs[side], ForgeDirection.getOrientation(side));
-				        }
+						{
+							float f = 0.7F;
+							double d0 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+							double d1 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+							double d2 = (double)(world.rand.nextFloat() * f) + (double)(1.0F - f) * 0.5D;
+							EntityItem entityitem = new EntityItem(world, (double)x + d0, (double)y + d1, (double)z + d2, theStack);
+							entityitem.delayBeforeCanPickup = 10;
+							world.spawnEntityInWorld(entityitem);
+							ts.getSide(ForgeDirection.getOrientation(side))
+								.onRemoved(ts, ts.configs[side], ForgeDirection.getOrientation(side));
+						}
 						
 						
 						ts.sides[side] = 0;
@@ -265,24 +268,24 @@ public class BlockSocket extends BlockContainer
 				SocketModule m = ts.getSide(ForgeDirection.getOrientation(side));
 				boolean wasDye = false;
 
-                if(m.canModuleBeDyed())
-                {
+				if(m.canModuleBeDyed())
+				{
 						
-                    if(player.getCurrentEquippedItem() != null)
-                    {
-                        int oreId = OreDictionary.getOreID(player.getCurrentEquippedItem());
-                        for(int i = 0; i < dyes.length; i++)
-                        {
-                            if(oreId == OreDictionary.getOreID(dyes[i]))
-                            {
-                                wasDye = true;
-                                m.changeColour(i, ts.configs[side], ts, ForgeDirection.getOrientation(side));
-                                player.getCurrentEquippedItem().stackSize--;
-                                break;
-                            }
-                        }
-                    }
-                }
+					if(player.getCurrentEquippedItem() != null)
+					{
+						int oreId = OreDictionary.getOreID(player.getCurrentEquippedItem());
+						for(int i = 0; i < dyes.length; i++)
+						{
+							if(oreId == OreDictionary.getOreID(dyes[i]))
+							{
+								wasDye = true;
+								m.changeColour(i, ts.configs[side], ts, ForgeDirection.getOrientation(side));
+								player.getCurrentEquippedItem().stackSize--;
+								break;
+							}
+						}
+					}
+				}
 				
 				if(! wasDye) m.onSideActivated(ts, ts.configs[side], ForgeDirection.getOrientation(side), player, subX, subY, subZ);
 			}
@@ -293,7 +296,7 @@ public class BlockSocket extends BlockContainer
 		{
 			TileSocket ts = (TileSocket)t;
 			ItemStack item = player.getCurrentEquippedItem();
-			if((item == null || (! (item.getItem() instanceof IToolWrench) && item.getItem() != SocketsMod.module && item.getItem() != SocketsMod.remote))  && side >= 0 && side < 6)
+			if((item == null || (! (item.getItem() instanceof IToolWrench) && item.getItem() != SocketsMod.module && item.getItem() != SocketsMod.remote))	&& side >= 0 && side < 6)
 			{
 				int oreId = OreDictionary.getOreID(player.getCurrentEquippedItem());
 				boolean wasDye = false;
@@ -335,14 +338,21 @@ public class BlockSocket extends BlockContainer
 	{
 		//System.out.println("Break");
 		super.breakBlock(par1World, par2, par3, par4, par5, par6);
+		//drop modules
+		for(int i = 0; i < 6; i++)
+		{
+			SocketModule side = tileSocket.getSide(ForgeDirection.getOrientation(i));
+			if(side != null && side.moduleID >= 1)
+				this.dropBlockAsItem_do(par1World, par2, par3, par4, new ItemStack(SocketsMod.module, 1, side.moduleID));
+		}
 		par1World.removeBlockTileEntity(par2, par3, par4);
 	}
-	
-	
+
+
 	@Override
 	@SideOnly(Side.CLIENT)
-    public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int blockSide)
-    {
+	public Icon getBlockTexture(IBlockAccess world, int x, int y, int z, int blockSide)
+	{
 		Icon result = blockIcon;
 		
 		TileEntity t = world.getBlockTileEntity(x, y, z);
@@ -366,12 +376,12 @@ public class BlockSocket extends BlockContainer
 		}
 		
 		return result;
-    }
+	}
 	
 	@Override
 	@SideOnly(Side.CLIENT)
-    public void registerIcons(IconRegister ir)
-    {
+	public void registerIcons(IconRegister ir)
+	{
 		SocketModule m;
 		int l;
 		int temp;
@@ -425,13 +435,13 @@ public class BlockSocket extends BlockContainer
 		buttonInd = ir.registerIcon("sockets:buttonInd");
 		hasData = ir.registerIcon("sockets:hasData");
 		
-    }
+	}
 	
 	@Override
-    public boolean canProvidePower()
-    {
-        return true;
-    }
+	public boolean canProvidePower()
+	{
+		return true;
+	}
 	
 	@Override
 	public boolean canConnectRedstone(IBlockAccess world, int x, int y, int z, int side)
@@ -489,8 +499,8 @@ public class BlockSocket extends BlockContainer
 	}
 	
 	@Override
-    public int isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side)
-    {
+	public int isProvidingStrongPower(IBlockAccess world, int x, int y, int z, int side)
+	{
 		TileEntity t = world.getBlockTileEntity(x, y, z);
 		
 		side = ForgeDirection.OPPOSITES[side];
@@ -505,10 +515,10 @@ public class BlockSocket extends BlockContainer
 		}
 		
 		return 0;
-    }
+	}
 	
 	public int isProvidingWeakPower(IBlockAccess world, int x, int y, int z, int side)
-    {
+	{
 		TileEntity t = world.getBlockTileEntity(x, y, z);
 		
 		side = ForgeDirection.OPPOSITES[side];
@@ -523,7 +533,7 @@ public class BlockSocket extends BlockContainer
 		}
 		
 		return 0;
-    }
+	}
 	
 	@Override
 	public boolean isBlockSolidOnSide(World world, int x, int y, int z, ForgeDirection side)
@@ -533,9 +543,9 @@ public class BlockSocket extends BlockContainer
 	
 	@Override
 	public boolean shouldSideBeRendered(IBlockAccess par1IBlockAccess, int par2, int par3, int par4, int par5)
-    {		
+	{		
 		return true;
-    }
+	}
 	
 	
 }
