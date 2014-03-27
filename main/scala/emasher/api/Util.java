@@ -2,6 +2,8 @@ package emasher.api;
 
 import emasher.sockets.PacketHandler;
 import emasher.sockets.SocketsMod;
+import emasher.sockets.TileSocket;
+import emasher.sockets.modules.ModTrack;
 import emasher.sockets.pipes.TileAdapterBase;
 import emasher.sockets.pipes.TileDirectionChanger;
 import net.minecraft.block.Block;
@@ -90,13 +92,6 @@ public class Util
                 te.xCoord = x;
                 te.yCoord = y;
                 te.zCoord = z;
-
-                if(te instanceof SocketTileAccess) for(int i = 0; i < 6; i++)
-                {
-                    ForgeDirection d = ForgeDirection.getOrientation(i);
-                    SocketModule m = ((SocketTileAccess) te).getSide(d);
-                    m.onSocketPlaced(((SocketTileAccess) te).getConfigForSide(d), (SocketTileAccess)te, d);
-                }
             }
         }
 
@@ -110,88 +105,61 @@ public class Util
                 te.xCoord = nx;
                 te.yCoord = ny;
                 te.zCoord = nz;
-
-                if(te instanceof SocketTileAccess) for(int i = 0; i < 6; i++)
-                {
-                    ForgeDirection d = ForgeDirection.getOrientation(i);
-                    SocketModule m = ((SocketTileAccess) te).getSide(d);
-                    m.onSocketPlaced(((SocketTileAccess) te).getConfigForSide(d), (SocketTileAccess)te, d);
-                }
             }
         }
 
         TileEntity te = world.getBlockTileEntity(x, y, z);
-        if(te != null)
-        {
-            if(te instanceof SocketTileAccess)
-            {
-                SocketTileAccess ts = (SocketTileAccess)te;
-                for(int i = 0; i < 6; i++)
-                {
-                    ForgeDirection side = ForgeDirection.getOrientation(i);
-                    SocketModule m = ts.getSide(side);
-                    m.onSocketPlaced(ts.getConfigForSide(side), ts, side);
-                    ts.sendClientSideState(i);
-                }
-            }
-
-            if(te instanceof TileAdapterBase)
-            {
-                TileAdapterBase ta = (TileAdapterBase)te;
-                for(int i = 0; i < 6; i++)
-                {
-                    PacketHandler.instance.sendClientAdapterSide(ta, i);
-                }
-            }
-
-            if(te instanceof TileDirectionChanger)
-            {
-                TileDirectionChanger td = (TileDirectionChanger)te;
-                for(int i = 0; i < 6; i++)
-                {
-                    PacketHandler.instance.sendClientChangerSide(td, i);
-                }
-            }
-        }
-
+        updateTileEntity(te, world);
 
         te = world.getBlockTileEntity(nx, ny, nz);
-
-        if(te != null)
-        {
-            if(te instanceof SocketTileAccess)
-            {
-                SocketTileAccess ts = (SocketTileAccess)te;
-                for(int i = 0; i < 6; i++)
-                {
-                    ForgeDirection side = ForgeDirection.getOrientation(i);
-                    SocketModule m = ts.getSide(side);
-                    m.onSocketPlaced(ts.getConfigForSide(side), ts, side);
-                    ts.sendClientSideState(i);
-                }
-            }
-
-            if(te instanceof TileAdapterBase)
-            {
-                TileAdapterBase ta = (TileAdapterBase)te;
-                for(int i = 0; i < 6; i++)
-                {
-                    PacketHandler.instance.sendClientAdapterSide(ta, i);
-                }
-            }
-
-            if(te instanceof TileDirectionChanger)
-            {
-                TileDirectionChanger td = (TileDirectionChanger)te;
-                for(int i = 0; i < 6; i++)
-                {
-                    PacketHandler.instance.sendClientChangerSide(td, i);
-                }
-            }
-        }
+        updateTileEntity(te, world);
 
         return true;
     }
+
+	private static void updateTileEntity(TileEntity te, World world) {
+		if(te == null) return;
+
+		if(te instanceof SocketTileAccess)
+			updateSocketTile((SocketTileAccess) te);
+
+		if(te instanceof TileAdapterBase)
+		{
+			TileAdapterBase ta = (TileAdapterBase)te;
+			for(int i = 0; i < 6; i++)
+			{
+				PacketHandler.instance.sendClientAdapterSide(ta, i);
+			}
+		}
+
+		if(te instanceof TileDirectionChanger)
+		{
+			TileDirectionChanger td = (TileDirectionChanger)te;
+			for(int i = 0; i < 6; i++)
+			{
+				ForgeDirection d = ForgeDirection.getOrientation(i);
+				TileEntity neighborEntity = world.getBlockTileEntity(
+						td.xCoord + d.offsetX,
+						td.yCoord + d.offsetY,
+						td.zCoord + d.offsetZ);
+
+				if(neighborEntity instanceof SocketTileAccess)
+					updateSocketTile((SocketTileAccess) neighborEntity);
+
+				PacketHandler.instance.sendClientChangerSide(td, i);
+			}
+		}
+	}
+
+	private static void updateSocketTile(SocketTileAccess ts) {
+		for(int i = 0; i < 6; i++)
+		{
+			ForgeDirection side = ForgeDirection.getOrientation(i);
+			SocketModule m = ts.getSide(side);
+			m.onSocketPlaced(ts.getConfigForSide(side), ts, side);
+			ts.sendClientSideState(i);
+		}
+	}
 
     public static boolean canMoveBlock(World world, int x, int y, int z, int nx, int ny, int nz)
     {
@@ -246,14 +214,9 @@ public class Util
             te.xCoord = nx;
             te.yCoord = ny;
             te.zCoord = nz;
+		}
 
-            if(updateSocket && te instanceof SocketTileAccess) for(int i = 0; i < 6; i++)
-            {
-                ForgeDirection d = ForgeDirection.getOrientation(i);
-                SocketModule m = ((SocketTileAccess) te).getSide(d);
-                m.onSocketPlaced(((SocketTileAccess) te).getConfigForSide(d), (SocketTileAccess)te, d);
-            }
-        }
+		updateTileEntity(te, world);
 
         return true;
     }
